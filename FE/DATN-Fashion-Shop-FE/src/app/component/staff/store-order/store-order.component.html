@@ -1,0 +1,236 @@
+<app-store-header title_header="Order" title_btn="Add Item"></app-store-header>
+
+<div class="container mt-4">
+  <!-- Bộ lọc -->
+  <!-- Bộ lọc -->
+  <div class="container mb-4">
+
+    <form [formGroup]="filterForm" (ngSubmit)="fetchStoreOrders()">
+      <div class="row g-3">
+
+        <!-- Trạng thái đơn hàng -->
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Order Status</label>
+          <select class="form-select" formControlName="orderStatusId">
+            <option value="">All</option>
+            <option value="1">Pending</option>
+            <option value="2">Processing</option>
+            <option value="3">Shipped</option>
+            <option value="4">Delivered</option>
+            <option value="5">Cancelled</option>
+            <option value="7">Ready to Pickup</option>
+            <option value="6">Done</option>
+          </select>
+        </div>
+
+        <!-- Phương thức thanh toán -->
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Payment Method</label>
+          <select class="form-select" formControlName="paymentMethodId">
+            <option value="">All</option>
+            <option value="1">COD</option>
+            <option value="2">VNPay</option>
+            <option value="3">Bank</option>
+            <option value="4">Cash</option>
+            <option value="5">Pay in Store</option>
+          </select>
+        </div>
+
+        <!-- Phương thức vận chuyển -->
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Shipping Method</label>
+          <select class="form-select" formControlName="shippingMethodId">
+            <option value="">All</option>
+<!--            <option value="1">Giao đến địa chỉ</option>-->
+            <option value="2">Click & Collect</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Customer ID</label>
+          <input type="number" class="form-control" formControlName="customerId" placeholder="Enter Customer ID">
+        </div>
+
+        <!-- Lọc theo Staff ID -->
+        <div class="col-md-3">
+          <label class="form-label">Staff ID</label>
+          <input type="number" class="form-control" formControlName="staffId" placeholder="Enter Staff ID">
+        </div>
+
+        <!-- Ngày bắt đầu -->
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Start Date</label>
+          <input type="date" class="form-control" formControlName="startDate">
+        </div>
+
+        <!-- Ngày kết thúc -->
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">End Date</label>
+          <input type="date" class="form-control" formControlName="endDate">
+        </div>
+
+        <!-- Nút hành động -->
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-funnel"></i> Apply
+          </button>
+          <button type="button" class="btn btn-danger ms-2 w-100" (click)="resetFilters()">
+            <i class="bi bi-arrow-clockwise"></i> Reset
+          </button>
+
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="button" class="btn btn-success w-100" (click)="toggleScanner()">
+            <i class="bi bi-upc-scan"></i> Scan QR
+          </button>
+        </div>
+        <div class="qr-scanner-container position-fixed bottom-0 end-0 m-3 shadow-lg bg-white rounded p-2" *ngIf="isScannerEnabled">
+          <h6 class="text-primary text-center">Scan QR</h6>
+          <zxing-scanner
+            (scanSuccess)="onQrCodeScanned($event)"
+            [formats]="allowedFormats"
+            class="scanner">
+          </zxing-scanner>
+          <button class="btn btn-danger btn-sm w-100 mt-2" (click)="toggleScanner()">
+            <i class="bi bi-x-circle"></i> Close
+          </button>
+        </div>
+
+
+
+      </div>
+    </form>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+      <thead class="table-dark text-center">
+      <tr>
+        <th>No.</th>
+        <th>Order ID</th>
+        <th>Total</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Shipping Method</th>
+        <th>Payment Method</th>
+        <th>Customer Name</th>
+        <th>Created By</th>
+        <th>Created At</th>
+        <th>Updated By</th>
+        <th>Updated At</th>
+        <th>Detail</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let order of storeOrders; let i = index"
+          class="text-center">
+        <td>{{ i + 1 }}</td>
+        <td class="fw-bold">{{ order.orderId }}</td>
+        <td class="fw-bold">{{ order.totalPrice | currency:'VND':'' }} VND
+        </td>
+        <td>{{ getTotalQuantity(order)}}</td>
+        <!--        <td>{{ transfer.warehouseId }}</td>-->
+        <!--        <td>{{ transfer.storeId }}</td>-->
+        <td>
+  <span class="fw-bold d-flex align-items-center">
+    <span
+      class="status-indicator"
+      [ngClass]="{
+        'bg-success': order.orderStatus.statusName === 'DONE',
+        'bg-warning': order.orderStatus.statusName === 'PENDING',
+        'bg-danger': order.orderStatus.statusName === 'CANCELLED'
+      }"
+    ></span>
+    {{ order.orderStatus.statusName }}
+  </span>
+        </td>
+
+        <td>{{ order.shippingMethod?.methodName || 'Pay In Store' }}</td>
+        <td>{{ order.paymentMethod?.methodName || '' }}</td>
+
+        <td>
+          {{ order.user ? (order.user.firstName || '') + ' ' + (order.user.lastName || '')
+          : 'Guest' }}
+        </td>
+
+        <!-- Nếu createdBy null, hiển thị 'System' -->
+        <td>{{ order.createdBy ? order.createdBy : 'System' }}</td>
+        <td>{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+
+        <!-- Nếu updatedBy null, hiển thị 'System' -->
+        <td>{{ order.updatedBy ? order.updatedBy : 'System' }}</td>
+        <td>{{ order.updatedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+
+        <td>
+          <button class="btn btn-primary" (click)="viewDetail(order.orderId)">View Details</button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex justify-content-end">
+  <button (click)="exportToExcel()" class="btn btn-success">Export Excel</button>
+  </div>
+  <!-- Pagination with page size selector -->
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <!-- Page size selector -->
+    <div class="page-size-selector">
+      <label for="pageSize" class="me-2">Items per page:</label>
+      <select id="pageSize" class="form-select form-select-sm d-inline-block w-auto"
+              [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+      </select>
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="pageNo === 0">
+          <button class="page-link" (click)="changePage(pageNo - 1)">Previous</button>
+        </li>
+
+        <!-- First page -->
+        <li class="page-item" [class.active]="0 === pageNo" *ngIf="showFirstPage()">
+          <button class="page-link" (click)="changePage(0)">1</button>
+        </li>
+
+        <li class="page-item" [class.active]="0 === pageNo" *ngIf="showFirstPage()">
+          <button class="page-link" (click)="changePage(1)">2</button>
+        </li>
+
+        <li class="page-item" [class.active]="0 === pageNo" *ngIf="showFirstPage()">
+          <button class="page-link" (click)="changePage(2)">3</button>
+        </li>
+
+        <!-- Ellipsis before -->
+        <li class="page-item disabled" *ngIf="showFirstEllipsis()">
+          <span class="page-link">...</span>
+        </li>
+
+        <!-- Middle pages -->
+        <ng-container *ngFor="let page of getDisplayedPages()">
+          <li class="page-item" [class.active]="page === pageNo">
+            <button class="page-link" (click)="changePage(page)">{{ page + 1 }}</button>
+          </li>
+        </ng-container>
+
+        <!-- Ellipsis after -->
+        <li class="page-item disabled" *ngIf="showLastEllipsis()">
+          <span class="page-link">...</span>
+        </li>
+
+        <!-- Last page -->
+        <li class="page-item" [class.active]="totalPages - 1 === pageNo" *ngIf="showLastPage()">
+          <button class="page-link" (click)="changePage(totalPages - 1)">{{ totalPages }}</button>
+        </li>
+
+        <li class="page-item" [class.disabled]="pageNo === totalPages - 1">
+          <button class="page-link" (click)="changePage(pageNo + 1)">Next</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

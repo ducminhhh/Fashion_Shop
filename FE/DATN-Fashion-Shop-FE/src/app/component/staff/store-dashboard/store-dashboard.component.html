@@ -1,0 +1,141 @@
+<app-store-header [title_header]="'Dashboard'" [title_btn]="'Statistic'" />
+<div class="container-fluid row">
+  <div class="col-12 col-md-6 col-xl-3 ">
+    <div class="statis-item  ">
+      <div class="row">
+        <div class="col-12 d-flex flex-column ps-4 pt-2  p-3">
+          <span>Today Revenue</span>
+          <strong>{{ totalRevenueToday | currency:'VND':'' }} VND</strong>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-12 col-md-6 col-xl-3 ">
+    <div class="statis-item  ">
+      <div class="row">
+        <div class="col-12 d-flex flex-column ps-4 pt-2 p-3">
+          <span>Month Revenue</span>
+          <strong>{{ totalRevenueThisMonth | currency:'VND':'' }} VND</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-12 col-md-6 col-xl-3 ">
+    <div class="statis-item  ">
+      <div class="row">
+        <div class="col-6 col-md-8  d-flex flex-column ps-4 pt-2 p-3">
+          <span>Today Total Orders</span>
+          <strong>{{ totalOrdersToday }}</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-12 col-md-6 col-xl-3 ">
+    <div class="statis-item  ">
+      <div class="row">
+        <div class="col-12 d-flex flex-column ps-4 pt-2 p-3">
+          <span>This Month Total Orders</span>
+          <strong>{{ totalOrdersThisMonth }}</strong>
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+
+  <div class="col-12">
+    <div class="chart-content line-chart-box ">
+      <span>{{currentYear}} Revenue</span>
+      <span>Total: {{totalMonthlyRevenue | currency:'VND':''}} VND</span>
+      <app-monthly-revenue-chart
+        [revenueData]="monthlyRevenueData"
+        [labels]="monthlyLabels">
+      </app-monthly-revenue-chart>
+
+    </div>
+  </div>
+
+  <div class="row">
+  <div class="col-6">
+    <div class="chart-content line-chart-box ">
+      <span>Weekly Revenue</span>
+      <span>Total: {{totalWeeklyRevenue | currency:'VND':''}} VND</span>
+      <app-weekly-revenue-chart
+        [revenueData]="weeklyRevenueData"
+        [labels]="weeklyLabels">
+      </app-weekly-revenue-chart>
+
+    </div>
+  </div>
+
+  <div class="col-3 ">
+    <div class="chart-content line-chart-box " style="height: 360px">
+      <span>{{currentYear}} Order Comparison</span>
+  <app-order-comparison-chart
+    [customerOrder]="customerOrder"
+    [guessOrder]="guessOrder">
+  </app-order-comparison-chart>
+</div>
+</div>
+
+  <div class="col-3">
+    <div class="chart-content line-chart-box " style="height: 360px">
+      <span>{{currentYear}} Payment Comparison</span>
+      <app-payment-comparison-chart
+        [bankTransfer]="bankTransfer"
+        [cash]="cash">
+      </app-payment-comparison-chart>
+    </div>
+  </div>
+  </div>
+
+  <div class="col-12 ">
+    <div class="chart-content line-chart-box  ">
+      <span>Top Products</span>
+
+      <app-top-products-table
+        [products]="topProducts"
+        [page]="topProductsPage"
+        [totalPages]="topProductsTotalPages"
+        (pageChange)="onTopProductsPageChange($event)">
+      </app-top-products-table>
+
+    </div>
+
+    <div class="col-12">
+      <div class="chart-content line-chart-box ">
+        <span>Latest Order</span>
+
+    <app-lastest-order
+      [orders]="orders"
+      [page]="ordersPage"
+      [totalPages]="ordersTotalPages"
+      (pageChange)="onOrdersPageChange($event)">
+    </app-lastest-order>
+      </div>
+
+
+      <div class="col-12">
+        <div class="chart-content line-chart-box ">
+          <span>Inventory Status</span>
+
+          <app-unsold-table
+            [unsoldProducts]="unsoldProducts"
+            [page]="unsoldPage"
+            [totalPages]="unsoldTotalPages"
+            (pageChange)="onUnsoldPageChange($event)">>
+          </app-unsold-table>
+        </div>
+  </div>
+
+
+
+  <!-- <app-bar-chart [lable]="labels" [data]="data"/> -->
+</div>
+</div>
+

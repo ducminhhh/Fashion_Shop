@@ -1,0 +1,50 @@
+
+
+*{
+
+  font-family: "Kanit", sans-serif;
+}
+.container-form{
+  // background-color: aqua;
+  padding: 10px;
+  display: flex;
+  gap: 16px;
+}
+.box-color{
+  text-align: center;
+  flex: 1;
+  border: 1px solid #b4b4b4;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+
+}
+.item-color{
+  display: flex;
+  gap: 10px;
+}
+
+h4{
+  padding: 4px;
+  background-color: #000000;
+  color: white
+
+}
+.form-label{
+  padding-left: 4px;
+}
+.box-size{
+  flex: 1;
+  border: 1px solid #b4b4b4;
+  background-color: white;
+  text-align: center;
+}
+
+
+input {
+  border-radius: 1px;
+  font-family: 600;
+  font-family: "Kanit", sans-serif;
+  width: 100%;
+
+}
